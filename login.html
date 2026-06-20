@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Play Monster 어드민 · 로그인</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="center">
+    <main class="card login-card">
+      <h1 class="logo">Play Monster</h1>
+      <p class="subtitle">관리자 콘솔</p>
+
+      <div id="error" class="alert" style="display: none"></div>
+
+      <button id="kakao-login" class="btn-kakao" type="button">
+        카카오로 로그인
+      </button>
+
+      <p class="hint">어드민 권한이 있는 카카오 계정만 접속할 수 있습니다.</p>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/kakao.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>
