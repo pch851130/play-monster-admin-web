@@ -57,9 +57,83 @@ window.Api = (function () {
     return body.responseData || {}; // Map<날짜, 합계>
   }
 
+  // status(PENDING/FAILED/COMPLETED) 별 PAYOUT 포인트 히스토리 목록 조회.
+  // GET /admin/payouts?status=PENDING
+  // 성공 시 PointHistory 배열 반환, 실패 시 null.
+  async function fetchPayouts(accessToken, status) {
+    var url =
+      CONFIG.API_BASE_URL +
+      "/admin/payouts?status=" +
+      encodeURIComponent(status);
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "GET",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || []; // List<PointHistory>
+  }
+
+  // 출금 상태를 변경하는 공통 호출. 성공 시 true, 실패 시 errorMessage(문자열) 반환.
+  async function putPayout(url, accessToken) {
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "PUT",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return "네트워크 오류가 발생했습니다.";
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body) {
+      return "응답을 해석할 수 없습니다.";
+    }
+    if (body.responseCode !== "OK") {
+      return body.errorMessage || "처리에 실패했습니다.";
+    }
+    return true;
+  }
+
+  // PENDING 출금을 완료(COMPLETED) 처리. PUT /admin/payouts/{uuid}/complete
+  async function completePayout(accessToken, uuid) {
+    return putPayout(
+      CONFIG.API_BASE_URL + "/admin/payouts/" + encodeURIComponent(uuid) + "/complete",
+      accessToken
+    );
+  }
+
+  // PENDING 출금을 실패(FAILED) 처리. PUT /admin/payouts/{uuid}/fail?reason=...
+  async function failPayout(accessToken, uuid, reason) {
+    return putPayout(
+      CONFIG.API_BASE_URL +
+        "/admin/payouts/" +
+        encodeURIComponent(uuid) +
+        "/fail?reason=" +
+        encodeURIComponent(reason),
+      accessToken
+    );
+  }
+
   return {
     fetchMe: fetchMe,
     isAdmin: isAdmin,
     fetchDailyPointSum: fetchDailyPointSum,
+    fetchPayouts: fetchPayouts,
+    completePayout: completePayout,
+    failPayout: failPayout,
   };
 })();

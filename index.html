@@ -60,6 +60,42 @@
             <tbody id="ps-body"></tbody>
           </table>
         </div>
+
+        <h2 class="section-title" style="margin-top: 28px">출금(PAYOUT) 목록</h2>
+        <div class="card">
+          <form id="payout-form" class="filter-bar">
+            <label class="field">
+              <span>상태</span>
+              <select id="po-status">
+                <option value="PENDING">PENDING</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+            </label>
+            <button type="submit" class="btn-primary">조회</button>
+          </form>
+
+          <p id="po-message" class="hint" style="display: none"></p>
+
+          <div class="table-scroll">
+            <table class="list-table" id="po-table" style="display: none">
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>포인트</th>
+                  <th>상태</th>
+                  <th>이름</th>
+                  <th>은행</th>
+                  <th>계좌번호</th>
+                  <th>생년월일</th>
+                  <th>실패사유</th>
+                  <th>처리</th>
+                </tr>
+              </thead>
+              <tbody id="po-body"></tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </main>
 

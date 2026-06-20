@@ -224,6 +224,54 @@ body {
   filter: brightness(0.95);
 }
 
+/* ===== 목록 테이블 ===== */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.list-table th,
+.list-table td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-table th {
+  color: var(--muted);
+  font-weight: 500;
+  background: var(--bg);
+}
+
+.btn-mini {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  padding: 4px 9px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-mini:hover {
+  filter: brightness(0.97);
+}
+
+.btn-ok {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-no {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 /* ===== 스피너 ===== */
 .spinner {
   width: 28px;
