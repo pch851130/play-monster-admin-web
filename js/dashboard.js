@@ -219,6 +219,8 @@
     var modal = document.getElementById("user-modal");
     var modalBody = document.getElementById("user-detail-body");
     var modalClose = document.getElementById("user-modal-close");
+    var bonusBtn = document.getElementById("user-bonus-btn");
+    var currentUuid = null; // 현재 상세 모달에 표시 중인 사용자
 
     function num(v) {
       return typeof v === "number" ? v.toLocaleString() : text(v);
@@ -276,6 +278,7 @@
     }
 
     async function showDetail(uuid) {
+      currentUuid = uuid;
       modalBody.innerHTML = row("UUID", uuid);
       modal.style.display = "flex";
 
@@ -304,6 +307,26 @@
 
     function closeModal() {
       modal.style.display = "none";
+      currentUuid = null;
+    }
+
+    async function giveBonus() {
+      if (!currentUuid) {
+        return;
+      }
+      if (!window.confirm("이 사용자에게 보너스 포인트를 지급할까요?")) {
+        return;
+      }
+      bonusBtn.disabled = true;
+      var result = await Api.giveBonus(Auth.getToken(), currentUuid);
+      bonusBtn.disabled = false;
+      if (result !== true) {
+        window.alert("지급 실패: " + result);
+        return;
+      }
+      window.alert("보너스 포인트를 지급했습니다.");
+      showDetail(currentUuid); // 상세 갱신(포인트 반영)
+      load(); // 목록도 갱신
     }
 
     // 이벤트 위임: 상세 버튼 클릭
@@ -329,6 +352,7 @@
     });
 
     modalClose.addEventListener("click", closeModal);
+    bonusBtn.addEventListener("click", giveBonus);
     modal.addEventListener("click", function (e) {
       if (e.target === modal) {
         closeModal(); // 배경 클릭 시 닫기

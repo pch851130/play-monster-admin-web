@@ -181,6 +181,15 @@ window.Api = (function () {
     return body.responseData; // User
   }
 
+  // 사용자에게 보너스 포인트 지급. PUT /admin/users/{uuid}/bonus
+  // 성공 시 true, 실패 시 errorMessage(문자열) 반환.
+  async function giveBonus(accessToken, uuid) {
+    return putPayout(
+      CONFIG.API_BASE_URL + "/admin/users/" + encodeURIComponent(uuid) + "/bonus",
+      accessToken
+    );
+  }
+
   return {
     fetchMe: fetchMe,
     isAdmin: isAdmin,
@@ -190,5 +199,6 @@ window.Api = (function () {
     failPayout: failPayout,
     fetchUsers: fetchUsers,
     fetchUser: fetchUser,
+    giveBonus: giveBonus,
   };
 })();

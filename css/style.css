@@ -331,3 +331,8 @@ body {
   justify-content: space-between;
   margin-bottom: 12px;
 }
+
+.modal-foot {
+  margin-top: 16px;
+  text-align: right;
+}
