@@ -128,6 +128,59 @@ window.Api = (function () {
     );
   }
 
+  // 사용자 목록(최신 가입순) 페이지 조회. GET /admin/users?page=0&size=20
+  // 성공 시 Spring Page 객체(content/totalPages/number 등) 반환, 실패 시 null.
+  async function fetchUsers(accessToken, page, size) {
+    var url =
+      CONFIG.API_BASE_URL +
+      "/admin/users?page=" +
+      encodeURIComponent(page) +
+      "&size=" +
+      encodeURIComponent(size);
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "GET",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || null; // Page<User>
+  }
+
+  // uuid 로 단일 사용자 조회. GET /admin/users/{uuid}
+  // 성공 시 User 반환, 실패 시 null.
+  async function fetchUser(accessToken, uuid) {
+    var res;
+    try {
+      res = await fetch(
+        CONFIG.API_BASE_URL + "/admin/users/" + encodeURIComponent(uuid),
+        {
+          method: "GET",
+          headers: { accessToken: accessToken },
+        }
+      );
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK" || !body.responseData) {
+      return null;
+    }
+    return body.responseData; // User
+  }
+
   return {
     fetchMe: fetchMe,
     isAdmin: isAdmin,
@@ -135,5 +188,7 @@ window.Api = (function () {
     fetchPayouts: fetchPayouts,
     completePayout: completePayout,
     failPayout: failPayout,
+    fetchUsers: fetchUsers,
+    fetchUser: fetchUser,
   };
 })();

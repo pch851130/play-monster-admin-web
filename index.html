@@ -96,8 +96,49 @@
             </table>
           </div>
         </div>
+
+        <h2 class="section-title" style="margin-top: 28px">사용자 목록</h2>
+        <div class="card">
+          <p id="us-message" class="hint" style="display: none"></p>
+
+          <div class="table-scroll">
+            <table class="list-table" id="us-table" style="display: none">
+              <thead>
+                <tr>
+                  <th>UUID</th>
+                  <th>이름</th>
+                  <th>포인트</th>
+                  <th>누적출금</th>
+                  <th>휴대폰</th>
+                  <th>추천코드</th>
+                  <th>가입일</th>
+                  <th>상세</th>
+                </tr>
+              </thead>
+              <tbody id="us-body"></tbody>
+            </table>
+          </div>
+
+          <div id="us-pager" class="pager" style="display: none">
+            <button type="button" id="us-prev" class="btn-ghost">이전</button>
+            <span id="us-page-info" class="admin-name"></span>
+            <button type="button" id="us-next" class="btn-ghost">다음</button>
+          </div>
+        </div>
       </section>
     </main>
+
+    <div id="user-modal" class="modal" style="display: none">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3 class="section-title" style="margin: 0">사용자 상세</h3>
+          <button type="button" id="user-modal-close" class="btn-ghost">닫기</button>
+        </div>
+        <table class="info-table">
+          <tbody id="user-detail-body"></tbody>
+        </table>
+      </div>
+    </div>
 
     <script src="js/config.js"></script>
     <script src="js/kakao.js"></script>

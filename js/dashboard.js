@@ -31,6 +31,7 @@
 
     initPointSum();
     initPayouts();
+    initUsers();
   }
 
   // 일자별 포인트 합계 조회 폼 동작
@@ -199,6 +200,142 @@
     });
 
     load(); // 최초 진입 시 기본값(PENDING)으로 자동 조회
+  }
+
+  // 사용자 목록(페이지네이션) + 상세 모달
+  function initUsers() {
+    var PAGE_SIZE = 20;
+    var page = 0;
+    var totalPages = 1;
+
+    var message = document.getElementById("us-message");
+    var table = document.getElementById("us-table");
+    var body = document.getElementById("us-body");
+    var pager = document.getElementById("us-pager");
+    var pageInfo = document.getElementById("us-page-info");
+    var prevBtn = document.getElementById("us-prev");
+    var nextBtn = document.getElementById("us-next");
+
+    var modal = document.getElementById("user-modal");
+    var modalBody = document.getElementById("user-detail-body");
+    var modalClose = document.getElementById("user-modal-close");
+
+    function num(v) {
+      return typeof v === "number" ? v.toLocaleString() : text(v);
+    }
+
+    function showMessage(msg) {
+      table.style.display = "none";
+      pager.style.display = "none";
+      message.textContent = msg;
+      message.style.display = "block";
+    }
+
+    function render(list) {
+      body.innerHTML = list
+        .map(function (u) {
+          return (
+            "<tr>" +
+            "<td>" + esc(u.uuid) + "</td>" +
+            "<td>" + esc(u.name) + "</td>" +
+            "<td>" + num(u.point) + "</td>" +
+            "<td>" + num(u.payoutPoint) + "</td>" +
+            "<td>" + esc(u.phoneNumber) + "</td>" +
+            "<td>" + esc(u.referralCode) + "</td>" +
+            "<td>" + esc(u.createdAt) + "</td>" +
+            '<td><button type="button" class="btn-mini" data-uuid="' +
+            esc(u.uuid) +
+            '">상세</button></td>' +
+            "</tr>"
+          );
+        })
+        .join("");
+
+      message.style.display = "none";
+      table.style.display = "table";
+      pager.style.display = "flex";
+      pageInfo.textContent = page + 1 + " / " + totalPages;
+      prevBtn.disabled = page <= 0;
+      nextBtn.disabled = page >= totalPages - 1;
+    }
+
+    async function load() {
+      showMessage("불러오는 중...");
+      var pageData = await Api.fetchUsers(Auth.getToken(), page, PAGE_SIZE);
+      if (!pageData) {
+        showMessage("조회에 실패했습니다.");
+        return;
+      }
+      totalPages = pageData.totalPages || 1;
+      var list = pageData.content || [];
+      if (list.length === 0) {
+        showMessage("데이터가 없습니다.");
+        return;
+      }
+      render(list);
+    }
+
+    async function showDetail(uuid) {
+      modalBody.innerHTML = row("UUID", uuid);
+      modal.style.display = "flex";
+
+      var u = await Api.fetchUser(Auth.getToken(), uuid);
+      if (!u) {
+        modalBody.innerHTML = row("오류", "사용자 정보를 불러오지 못했습니다.");
+        return;
+      }
+      modalBody.innerHTML = [
+        row("UUID", u.uuid),
+        row("이름", u.name),
+        row("포인트", num(u.point)),
+        row("누적 출금 포인트", num(u.payoutPoint)),
+        row("친구 수", u.friendUserCount),
+        row("추천 코드", u.referralCode),
+        row("휴대폰", u.phoneNumber),
+        row("은행", u.bankName),
+        row("계좌번호", u.accountNumber),
+        row("생년월일", u.birthDate),
+        row("어드민", u.admin === true ? "예" : "아니오"),
+        row("게스트", u.guest === true ? "예" : "아니오"),
+        row("탈퇴", u.deleted === true ? "예" : "아니오"),
+        row("가입일", u.createdAt),
+      ].join("");
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    // 이벤트 위임: 상세 버튼 클릭
+    body.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-uuid]");
+      if (!btn) {
+        return;
+      }
+      showDetail(btn.getAttribute("data-uuid"));
+    });
+
+    prevBtn.addEventListener("click", function () {
+      if (page > 0) {
+        page--;
+        load();
+      }
+    });
+    nextBtn.addEventListener("click", function () {
+      if (page < totalPages - 1) {
+        page++;
+        load();
+      }
+    });
+
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeModal(); // 배경 클릭 시 닫기
+      }
+    });
+
+    load();
   }
 
   document.getElementById("logout").addEventListener("click", function () {
