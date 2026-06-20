@@ -28,6 +28,41 @@
             <tbody id="user-table"></tbody>
           </table>
         </div>
+
+        <h2 class="section-title" style="margin-top: 28px">일자별 포인트 합계</h2>
+        <div class="card">
+          <form id="point-sum-form" class="filter-bar">
+            <label class="field">
+              <span>기간(일)</span>
+              <input id="ps-day" type="number" min="1" value="7" />
+            </label>
+            <label class="field">
+              <span>타입</span>
+              <select id="ps-type">
+                <option value="OFFERWALL">OFFERWALL</option>
+                <option value="WELCOME">WELCOME</option>
+                <option value="REFERRAL">REFERRAL</option>
+                <option value="PAYOUT">PAYOUT</option>
+                <option value="DAILY_CHECK">DAILY_CHECK</option>
+                <option value="BONUS">BONUS</option>
+                <option value="WITHDRAW">WITHDRAW</option>
+              </select>
+            </label>
+            <button type="submit" class="btn-primary">조회</button>
+          </form>
+
+          <p id="ps-message" class="hint" style="display: none"></p>
+
+          <table class="info-table" id="ps-table" style="display: none">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <td>포인트 합계</td>
+              </tr>
+            </thead>
+            <tbody id="ps-body"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 

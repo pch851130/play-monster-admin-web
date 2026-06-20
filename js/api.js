@@ -28,5 +28,38 @@ window.Api = (function () {
     return !!user && user.admin === true;
   }
 
-  return { fetchMe: fetchMe, isAdmin: isAdmin };
+  // 최근 day 일간 type 별 일자별 포인트 합계 조회.
+  // GET /admin/point-history/daily-sum?day=7&type=OFFERWALL
+  // 성공 시 { "yyyy-MM-dd": 합계, ... } 맵 반환, 실패 시 null.
+  async function fetchDailyPointSum(accessToken, day, type) {
+    var url =
+      CONFIG.API_BASE_URL +
+      "/admin/point-history/daily-sum?day=" +
+      encodeURIComponent(day) +
+      "&type=" +
+      encodeURIComponent(type);
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "GET",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || {}; // Map<날짜, 합계>
+  }
+
+  return {
+    fetchMe: fetchMe,
+    isAdmin: isAdmin,
+    fetchDailyPointSum: fetchDailyPointSum,
+  };
 })();
