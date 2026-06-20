@@ -19,22 +19,6 @@
 
     document.getElementById("admin-name").textContent = user.name || user.referralCode || "관리자";
 
-    var rows = [
-      row("UUID", user.uuid),
-      row("이름", user.name),
-      row("포인트", typeof user.point === "number" ? user.point.toLocaleString() : user.point),
-      row("누적 출금 포인트", typeof user.payoutPoint === "number" ? user.payoutPoint.toLocaleString() : user.payoutPoint),
-      row("친구 수", user.friendUserCount),
-      row("추천 코드", user.referralCode),
-      row("휴대폰", user.phoneNumber),
-      row("은행", user.bankName),
-      row("계좌번호", user.accountNumber),
-      row("생년월일", user.birthDate),
-      row("어드민", user.admin === true ? "예" : "아니오"),
-      row("가입일", user.createdAt),
-    ];
-    document.getElementById("user-table").innerHTML = rows.join("");
-
     initPointSum();
   }
 
