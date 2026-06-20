@@ -128,15 +128,19 @@ window.Api = (function () {
     );
   }
 
-  // 사용자 목록(최신 가입순) 페이지 조회. GET /admin/users?page=0&size=20
+  // 사용자 목록(최신 가입순) 페이지 조회. GET /admin/users?page=0&size=20&search=...
+  // search 가 있으면 이름/휴대폰/추천코드/UUID 부분일치 검색.
   // 성공 시 Spring Page 객체(content/totalPages/number 등) 반환, 실패 시 null.
-  async function fetchUsers(accessToken, page, size) {
+  async function fetchUsers(accessToken, page, size, search) {
     var url =
       CONFIG.API_BASE_URL +
       "/admin/users?page=" +
       encodeURIComponent(page) +
       "&size=" +
       encodeURIComponent(size);
+    if (search) {
+      url += "&search=" + encodeURIComponent(search);
+    }
     var res;
     try {
       res = await fetch(url, {

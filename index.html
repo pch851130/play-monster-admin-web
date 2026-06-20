@@ -99,6 +99,14 @@
 
         <h2 class="section-title" style="margin-top: 28px">사용자 목록</h2>
         <div class="card">
+          <form id="user-search-form" class="filter-bar">
+            <label class="field" style="flex: 1; min-width: 200px">
+              <span>검색 (이름/휴대폰/추천코드/UUID)</span>
+              <input id="us-search" type="text" placeholder="검색어 입력" style="width: 100%" />
+            </label>
+            <button type="submit" class="btn-primary">검색</button>
+          </form>
+
           <p id="us-message" class="hint" style="display: none"></p>
 
           <div class="table-scroll">

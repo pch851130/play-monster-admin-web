@@ -207,7 +207,10 @@
     var PAGE_SIZE = 20;
     var page = 0;
     var totalPages = 1;
+    var search = ""; // 현재 검색어
 
+    var searchForm = document.getElementById("user-search-form");
+    var searchInput = document.getElementById("us-search");
     var message = document.getElementById("us-message");
     var table = document.getElementById("us-table");
     var body = document.getElementById("us-body");
@@ -263,7 +266,7 @@
 
     async function load() {
       showMessage("불러오는 중...");
-      var pageData = await Api.fetchUsers(Auth.getToken(), page, PAGE_SIZE);
+      var pageData = await Api.fetchUsers(Auth.getToken(), page, PAGE_SIZE, search);
       if (!pageData) {
         showMessage("조회에 실패했습니다.");
         return;
@@ -336,6 +339,13 @@
         return;
       }
       showDetail(btn.getAttribute("data-uuid"));
+    });
+
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      search = searchInput.value.trim();
+      page = 0; // 검색 시 첫 페이지부터
+      load();
     });
 
     prevBtn.addEventListener("click", function () {
