@@ -154,6 +154,25 @@
         <table class="info-table">
           <tbody id="user-detail-body"></tbody>
         </table>
+
+        <h4 class="section-title" style="margin: 20px 0 10px">출금 내역</h4>
+        <p id="user-payout-message" class="hint" style="display: none"></p>
+        <div class="table-scroll">
+          <table class="list-table" id="user-payout-table" style="display: none">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>포인트</th>
+                <th>상태</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>실패사유</th>
+              </tr>
+            </thead>
+            <tbody id="user-payout-body"></tbody>
+          </table>
+        </div>
+
         <div class="modal-foot">
           <button type="button" id="user-bonus-btn" class="btn-primary">보너스 지급</button>
         </div>

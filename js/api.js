@@ -214,6 +214,32 @@ window.Api = (function () {
     return body.responseData; // User
   }
 
+  // uuid 로 특정 사용자의 PAYOUT 포인트 히스토리 목록 조회(최신순).
+  // GET /admin/users/{uuid}/payouts
+  // 성공 시 PointHistory 배열 반환, 실패 시 null.
+  async function fetchUserPayouts(accessToken, uuid) {
+    var res;
+    try {
+      res = await fetch(
+        CONFIG.API_BASE_URL + "/admin/users/" + encodeURIComponent(uuid) + "/payouts",
+        {
+          method: "GET",
+          headers: { accessToken: accessToken },
+        }
+      );
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || []; // List<PointHistory>
+  }
+
   // 사용자에게 보너스 포인트 지급. PUT /admin/users/{uuid}/bonus
   // 성공 시 true, 실패 시 errorMessage(문자열) 반환.
   async function giveBonus(accessToken, uuid) {
@@ -233,6 +259,7 @@ window.Api = (function () {
     failPayout: failPayout,
     fetchUsers: fetchUsers,
     fetchUser: fetchUser,
+    fetchUserPayouts: fetchUserPayouts,
     giveBonus: giveBonus,
   };
 })();

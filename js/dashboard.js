@@ -24,6 +24,10 @@
     if (v === null || v === undefined || v === "") {
       return "-";
     }
+    // 날짜만 있는 값(yyyy-MM-dd)은 타임존 보정 없이 00:00:00 으로 표기
+    if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+      return v + " 00:00:00";
+    }
     var d = new Date(v);
     if (isNaN(d.getTime())) {
       return text(v); // 파싱 실패 시 원본 표기
@@ -212,7 +216,7 @@
         .map(function (item) {
           return (
             "<tr>" +
-            "<td>" + esc(item.date) + "</td>" +
+            "<td>" + esc(fmtDateTime(item.date)) + "</td>" +
             "<td>" + num(item.point) + "</td>" +
             "<td>" + esc(item.payoutStatus) + "</td>" +
             '<td><button type="button" class="btn-link" data-detail-uuid="' +
@@ -220,7 +224,7 @@
             '">' + esc(item.name) + "</button></td>" +
             "<td>" + esc(item.bankName) + "</td>" +
             "<td>" + esc(item.accountNumber) + "</td>" +
-            "<td>" + esc(item.birthDate) + "</td>" +
+            "<td>" + esc(fmtDateTime(item.birthDate)) + "</td>" +
             "<td>" + esc(item.payoutFailedReason) + "</td>" +
             "<td>" + actionCell(item) + "</td>" +
             "</tr>"
@@ -403,11 +407,49 @@
     var modalBody = document.getElementById("user-detail-body");
     var modalClose = document.getElementById("user-modal-close");
     var bonusBtn = document.getElementById("user-bonus-btn");
+    var payoutMessage = document.getElementById("user-payout-message");
+    var payoutTable = document.getElementById("user-payout-table");
+    var payoutBody = document.getElementById("user-payout-body");
     var currentUuid = null; // 현재 상세 모달에 표시 중인 사용자
     var onChange = null; // 지급 후 호출할 콜백
 
     function num(v) {
       return typeof v === "number" ? v.toLocaleString() : text(v);
+    }
+
+    function showPayoutMessage(msg) {
+      payoutTable.style.display = "none";
+      payoutMessage.textContent = msg;
+      payoutMessage.style.display = "block";
+    }
+
+    async function renderPayouts(uuid) {
+      showPayoutMessage("불러오는 중...");
+      var list = await Api.fetchUserPayouts(Auth.getToken(), uuid);
+      if (!list) {
+        showPayoutMessage("출금 내역 조회에 실패했습니다.");
+        return;
+      }
+      if (list.length === 0) {
+        showPayoutMessage("출금 내역이 없습니다.");
+        return;
+      }
+      payoutBody.innerHTML = list
+        .map(function (item) {
+          return (
+            "<tr>" +
+            "<td>" + esc(fmtDateTime(item.date)) + "</td>" +
+            "<td>" + num(item.point) + "</td>" +
+            "<td>" + esc(item.payoutStatus) + "</td>" +
+            "<td>" + esc(item.bankName) + "</td>" +
+            "<td>" + esc(item.accountNumber) + "</td>" +
+            "<td>" + esc(item.payoutFailedReason) + "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+      payoutMessage.style.display = "none";
+      payoutTable.style.display = "table";
     }
 
     async function render(uuid) {
@@ -427,7 +469,7 @@
         row("휴대폰", u.phoneNumber),
         row("은행", u.bankName),
         row("계좌번호", u.accountNumber),
-        row("생년월일", u.birthDate),
+        row("생년월일", fmtDateTime(u.birthDate)),
         row("어드민", u.admin === true ? "예" : "아니오"),
         row("게스트", u.guest === true ? "예" : "아니오"),
         row("탈퇴", u.deleted === true ? "예" : "아니오"),
@@ -440,6 +482,7 @@
       onChange = changeCb || null;
       modal.style.display = "flex";
       render(uuid);
+      renderPayouts(uuid);
     }
 
     function closeModal() {
