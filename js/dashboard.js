@@ -8,6 +8,29 @@
     return "<tr><th>" + label + "</th><td>" + text(value) + "</td></tr>";
   }
 
+  // 타임스탬프를 한국시간 기준 yyyy-MM-dd HH:mm:ss 로 표기
+  var DATETIME_FMT = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  function fmtDateTime(v) {
+    if (v === null || v === undefined || v === "") {
+      return "-";
+    }
+    var d = new Date(v);
+    if (isNaN(d.getTime())) {
+      return text(v); // 파싱 실패 시 원본 표기
+    }
+    return DATETIME_FMT.format(d); // "yyyy-MM-dd HH:mm:ss"
+  }
+
   // HTML 인젝션 방지용 escape
   function esc(v) {
     return text(v)
@@ -303,13 +326,12 @@
         .map(function (u) {
           return (
             "<tr>" +
-            "<td>" + esc(u.uuid) + "</td>" +
             "<td>" + esc(u.name) + "</td>" +
             "<td>" + num(u.point) + "</td>" +
             "<td>" + num(u.payoutPoint) + "</td>" +
             "<td>" + esc(u.phoneNumber) + "</td>" +
             "<td>" + esc(u.referralCode) + "</td>" +
-            "<td>" + esc(u.createdAt) + "</td>" +
+            "<td>" + esc(fmtDateTime(u.createdAt)) + "</td>" +
             '<td><button type="button" class="btn-mini" data-uuid="' +
             esc(u.uuid) +
             '">상세</button></td>' +
@@ -409,7 +431,7 @@
         row("어드민", u.admin === true ? "예" : "아니오"),
         row("게스트", u.guest === true ? "예" : "아니오"),
         row("탈퇴", u.deleted === true ? "예" : "아니오"),
-        row("가입일", u.createdAt),
+        row("가입일", fmtDateTime(u.createdAt)),
       ].join("");
     }
 
