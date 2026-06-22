@@ -29,30 +29,46 @@
 
     document.getElementById("admin-name").textContent = user.name || user.referralCode || "관리자";
 
-    initMenu();
-    initPointSum();
-    initPayouts();
-    initUsers();
+    // 각 패널의 로더를 등록(아직 조회하지 않음)
+    var loaders = {
+      "panel-points": initPointSum(),
+      "panel-payouts": initPayouts(),
+      "panel-users": initUsers(),
+    };
+    initMenu(loaders);
   }
 
-  // 상단 메뉴(탭): 클릭한 메뉴의 패널만 표시
-  function initMenu() {
+  // 상단 메뉴(탭): 클릭한 메뉴의 패널만 표시 + 최초 진입 시에만 조회(지연 로딩)
+  function initMenu(loaders) {
     var menu = document.getElementById("menu");
     var items = menu.querySelectorAll(".menu-item");
+    var loaded = {}; // 이미 조회한 패널 기록
+
+    function activate(target) {
+      items.forEach(function (item) {
+        var on = item.getAttribute("data-target") === target;
+        item.classList.toggle("active", on);
+        document.getElementById(item.getAttribute("data-target")).style.display = on ? "block" : "none";
+      });
+
+      // 해당 패널을 처음 여는 경우에만 데이터 조회
+      if (!loaded[target] && loaders[target]) {
+        loaded[target] = true;
+        loaders[target]();
+      }
+    }
 
     menu.addEventListener("click", function (e) {
       var btn = e.target.closest(".menu-item");
       if (!btn) {
         return;
       }
-      var target = btn.getAttribute("data-target");
-
-      items.forEach(function (item) {
-        var on = item === btn;
-        item.classList.toggle("active", on);
-        document.getElementById(item.getAttribute("data-target")).style.display = on ? "block" : "none";
-      });
+      activate(btn.getAttribute("data-target"));
     });
+
+    // 기본 활성 메뉴 조회
+    var initial = menu.querySelector(".menu-item.active") || items[0];
+    activate(initial.getAttribute("data-target"));
   }
 
   // 일자별 포인트 합계 조회 폼 동작
@@ -111,7 +127,7 @@
       load();
     });
 
-    load(); // 최초 진입 시 기본값(7일, OFFERWALL)으로 자동 조회
+    return load; // 메뉴 진입 시 기본값(7일, OFFERWALL)으로 조회
   }
 
   // 출금(PAYOUT) 목록 조회 + 성공/실패 처리
@@ -220,7 +236,7 @@
       load();
     });
 
-    load(); // 최초 진입 시 기본값(PENDING)으로 자동 조회
+    return load; // 메뉴 진입 시 기본값(PENDING)으로 조회
   }
 
   // 사용자 목록(페이지네이션) + 상세 모달
@@ -390,7 +406,7 @@
       }
     });
 
-    load();
+    return load; // 메뉴 진입 시 첫 페이지 조회
   }
 
   document.getElementById("logout").addEventListener("click", function () {
