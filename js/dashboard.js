@@ -94,8 +94,15 @@
 
       showMessage("불러오는 중...");
 
-      var sumMap = await Api.fetchDailyPointSum(Auth.getToken(), day, type);
-      if (!sumMap) {
+      // 포인트 합계와 사용자수를 함께 조회
+      var token = Auth.getToken();
+      var results = await Promise.all([
+        Api.fetchDailyPointSum(token, day, type),
+        Api.fetchDailyUserCount(token, day, type),
+      ]);
+      var sumMap = results[0];
+      var countMap = results[1];
+      if (!sumMap || !countMap) {
         showMessage("조회에 실패했습니다.");
         return;
       }
@@ -107,15 +114,25 @@
         return;
       }
 
-      var total = 0;
+      var totalPoint = 0;
+      var totalCount = 0; // 사용자수 합(일자별 중복 포함)
       var html = dates
         .map(function (date) {
           var point = sumMap[date];
-          total += point;
-          return row(date, point.toLocaleString());
+          var count = countMap[date] || 0;
+          totalPoint += point;
+          totalCount += count;
+          return (
+            "<tr><th>" + date + "</th>" +
+            "<td>" + point.toLocaleString() + "</td>" +
+            "<td>" + count.toLocaleString() + "</td></tr>"
+          );
         })
         .join("");
-      html += "<tr><th>합계</th><td>" + total.toLocaleString() + "</td></tr>";
+      html +=
+        "<tr><th>합계</th>" +
+        "<td>" + totalPoint.toLocaleString() + "</td>" +
+        "<td>" + totalCount.toLocaleString() + "</td></tr>";
       body.innerHTML = html;
 
       message.style.display = "none";

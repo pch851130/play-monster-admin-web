@@ -57,6 +57,35 @@ window.Api = (function () {
     return body.responseData || {}; // Map<날짜, 합계>
   }
 
+  // 최근 day 일간 type 별 일자별 (중복 제거) 사용자 수 조회.
+  // GET /admin/point-history/daily-count?day=7&type=OFFERWALL
+  // 성공 시 { "yyyy-MM-dd": 사용자수, ... } 맵 반환, 실패 시 null.
+  async function fetchDailyUserCount(accessToken, day, type) {
+    var url =
+      CONFIG.API_BASE_URL +
+      "/admin/point-history/daily-count?day=" +
+      encodeURIComponent(day) +
+      "&type=" +
+      encodeURIComponent(type);
+    var res;
+    try {
+      res = await fetch(url, {
+        method: "GET",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || {}; // Map<날짜, 사용자수>
+  }
+
   // status(PENDING/FAILED/COMPLETED) 별 PAYOUT 포인트 히스토리 목록 조회.
   // GET /admin/payouts?status=PENDING
   // 성공 시 PointHistory 배열 반환, 실패 시 null.
@@ -198,6 +227,7 @@ window.Api = (function () {
     fetchMe: fetchMe,
     isAdmin: isAdmin,
     fetchDailyPointSum: fetchDailyPointSum,
+    fetchDailyUserCount: fetchDailyUserCount,
     fetchPayouts: fetchPayouts,
     completePayout: completePayout,
     failPayout: failPayout,
