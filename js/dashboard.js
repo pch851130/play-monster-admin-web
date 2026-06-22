@@ -29,11 +29,14 @@
 
     document.getElementById("admin-name").textContent = user.name || user.referralCode || "관리자";
 
+    // 공용 사용자 상세 모달(출금/사용자 목록에서 공유)
+    var showDetail = initUserDetail();
+
     // 각 패널의 로더를 등록(아직 조회하지 않음)
     var loaders = {
       "panel-points": initPointSum(),
-      "panel-payouts": initPayouts(),
-      "panel-users": initUsers(),
+      "panel-payouts": initPayouts(showDetail),
+      "panel-users": initUsers(showDetail),
     };
     initMenu(loaders);
   }
@@ -147,8 +150,8 @@
     return load; // 메뉴 진입 시 기본값(7일, OFFERWALL)으로 조회
   }
 
-  // 출금(PAYOUT) 목록 조회 + 성공/실패 처리
-  function initPayouts() {
+  // 출금(PAYOUT) 목록 조회 + 성공/실패 처리. showDetail: 공용 사용자 상세 모달
+  function initPayouts(showDetail) {
     var form = document.getElementById("payout-form");
     var statusSelect = document.getElementById("po-status");
     var message = document.getElementById("po-message");
@@ -189,7 +192,9 @@
             "<td>" + esc(item.date) + "</td>" +
             "<td>" + num(item.point) + "</td>" +
             "<td>" + esc(item.payoutStatus) + "</td>" +
-            "<td>" + esc(item.name) + "</td>" +
+            '<td><button type="button" class="btn-link" data-detail-uuid="' +
+            esc(item.uuid) +
+            '">' + esc(item.name) + "</button></td>" +
             "<td>" + esc(item.bankName) + "</td>" +
             "<td>" + esc(item.accountNumber) + "</td>" +
             "<td>" + esc(item.birthDate) + "</td>" +
@@ -248,6 +253,15 @@
       handleAction(btn.getAttribute("data-action"), btn.getAttribute("data-uuid"));
     });
 
+    // 이벤트 위임: 이름 클릭 → 공용 사용자 상세 모달(지급 후 목록 갱신)
+    body.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-detail-uuid]");
+      if (!btn) {
+        return;
+      }
+      showDetail(btn.getAttribute("data-detail-uuid"), load);
+    });
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       load();
@@ -256,8 +270,8 @@
     return load; // 메뉴 진입 시 기본값(PENDING)으로 조회
   }
 
-  // 사용자 목록(페이지네이션) + 상세 모달
-  function initUsers() {
+  // 사용자 목록(페이지네이션). showDetail: 공용 사용자 상세 모달 열기 함수
+  function initUsers(showDetail) {
     var PAGE_SIZE = 20;
     var page = 0;
     var totalPages = 1;
@@ -272,12 +286,6 @@
     var pageInfo = document.getElementById("us-page-info");
     var prevBtn = document.getElementById("us-prev");
     var nextBtn = document.getElementById("us-next");
-
-    var modal = document.getElementById("user-modal");
-    var modalBody = document.getElementById("user-detail-body");
-    var modalClose = document.getElementById("user-modal-close");
-    var bonusBtn = document.getElementById("user-bonus-btn");
-    var currentUuid = null; // 현재 상세 모달에 표시 중인 사용자
 
     function num(v) {
       return typeof v === "number" ? v.toLocaleString() : text(v);
@@ -334,11 +342,54 @@
       render(list);
     }
 
-    async function showDetail(uuid) {
-      currentUuid = uuid;
-      modalBody.innerHTML = row("UUID", uuid);
-      modal.style.display = "flex";
+    // 이벤트 위임: 상세 버튼 클릭 → 공용 상세 모달(지급 후 목록 갱신)
+    body.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-uuid]");
+      if (!btn) {
+        return;
+      }
+      showDetail(btn.getAttribute("data-uuid"), load);
+    });
 
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      search = searchInput.value.trim();
+      page = 0; // 검색 시 첫 페이지부터
+      load();
+    });
+
+    prevBtn.addEventListener("click", function () {
+      if (page > 0) {
+        page--;
+        load();
+      }
+    });
+    nextBtn.addEventListener("click", function () {
+      if (page < totalPages - 1) {
+        page++;
+        load();
+      }
+    });
+
+    return load; // 메뉴 진입 시 첫 페이지 조회
+  }
+
+  // 공용 사용자 상세 모달. show(uuid, onChange) 로 열기.
+  // onChange: 보너스 지급 후 호출할 콜백(목록 갱신 등)
+  function initUserDetail() {
+    var modal = document.getElementById("user-modal");
+    var modalBody = document.getElementById("user-detail-body");
+    var modalClose = document.getElementById("user-modal-close");
+    var bonusBtn = document.getElementById("user-bonus-btn");
+    var currentUuid = null; // 현재 상세 모달에 표시 중인 사용자
+    var onChange = null; // 지급 후 호출할 콜백
+
+    function num(v) {
+      return typeof v === "number" ? v.toLocaleString() : text(v);
+    }
+
+    async function render(uuid) {
+      modalBody.innerHTML = row("UUID", uuid);
       var u = await Api.fetchUser(Auth.getToken(), uuid);
       if (!u) {
         modalBody.innerHTML = row("오류", "사용자 정보를 불러오지 못했습니다.");
@@ -362,9 +413,17 @@
       ].join("");
     }
 
+    function show(uuid, changeCb) {
+      currentUuid = uuid;
+      onChange = changeCb || null;
+      modal.style.display = "flex";
+      render(uuid);
+    }
+
     function closeModal() {
       modal.style.display = "none";
       currentUuid = null;
+      onChange = null;
     }
 
     async function giveBonus() {
@@ -382,38 +441,11 @@
         return;
       }
       window.alert("보너스 포인트를 지급했습니다.");
-      showDetail(currentUuid); // 상세 갱신(포인트 반영)
-      load(); // 목록도 갱신
+      render(currentUuid); // 상세 갱신(포인트 반영)
+      if (onChange) {
+        onChange(); // 호출한 목록 갱신
+      }
     }
-
-    // 이벤트 위임: 상세 버튼 클릭
-    body.addEventListener("click", function (e) {
-      var btn = e.target.closest("button[data-uuid]");
-      if (!btn) {
-        return;
-      }
-      showDetail(btn.getAttribute("data-uuid"));
-    });
-
-    searchForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      search = searchInput.value.trim();
-      page = 0; // 검색 시 첫 페이지부터
-      load();
-    });
-
-    prevBtn.addEventListener("click", function () {
-      if (page > 0) {
-        page--;
-        load();
-      }
-    });
-    nextBtn.addEventListener("click", function () {
-      if (page < totalPages - 1) {
-        page++;
-        load();
-      }
-    });
 
     modalClose.addEventListener("click", closeModal);
     bonusBtn.addEventListener("click", giveBonus);
@@ -423,7 +455,7 @@
       }
     });
 
-    return load; // 메뉴 진입 시 첫 페이지 조회
+    return show;
   }
 
   document.getElementById("logout").addEventListener("click", function () {

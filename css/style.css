@@ -292,6 +292,21 @@ body {
   filter: brightness(0.97);
 }
 
+/* 표 안에서 링크처럼 보이는 버튼(예: 이름 클릭으로 상세 열기) */
+.btn-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  filter: brightness(0.9);
+}
+
 .btn-ok {
   border-color: var(--primary);
   color: var(--primary);
