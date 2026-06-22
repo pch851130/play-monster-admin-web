@@ -29,9 +29,30 @@
 
     document.getElementById("admin-name").textContent = user.name || user.referralCode || "관리자";
 
+    initMenu();
     initPointSum();
     initPayouts();
     initUsers();
+  }
+
+  // 상단 메뉴(탭): 클릭한 메뉴의 패널만 표시
+  function initMenu() {
+    var menu = document.getElementById("menu");
+    var items = menu.querySelectorAll(".menu-item");
+
+    menu.addEventListener("click", function (e) {
+      var btn = e.target.closest(".menu-item");
+      if (!btn) {
+        return;
+      }
+      var target = btn.getAttribute("data-target");
+
+      items.forEach(function (item) {
+        var on = item === btn;
+        item.classList.toggle("active", on);
+        document.getElementById(item.getAttribute("data-target")).style.display = on ? "block" : "none";
+      });
+    });
   }
 
   // 일자별 포인트 합계 조회 폼 동작

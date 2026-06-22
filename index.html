@@ -21,8 +21,14 @@
         <p>불러오는 중...</p>
       </div>
 
-      <section id="content" class="content" style="display: none">
-        <h2 class="section-title">일자별 포인트 합계</h2>
+      <div id="content" class="content" style="display: none">
+        <nav class="menu" id="menu">
+          <button type="button" class="menu-item active" data-target="panel-points">일자별 포인트 합계</button>
+          <button type="button" class="menu-item" data-target="panel-payouts">출금(PAYOUT) 목록</button>
+          <button type="button" class="menu-item" data-target="panel-users">사용자 목록</button>
+        </nav>
+
+        <section class="panel" id="panel-points">
         <div class="card">
           <form id="point-sum-form" class="filter-bar">
             <label class="field">
@@ -60,8 +66,9 @@
             <tbody id="ps-body"></tbody>
           </table>
         </div>
+        </section>
 
-        <h2 class="section-title" style="margin-top: 28px">출금(PAYOUT) 목록</h2>
+        <section class="panel" id="panel-payouts" style="display: none">
         <div class="card">
           <form id="payout-form" class="filter-bar">
             <label class="field">
@@ -96,8 +103,9 @@
             </table>
           </div>
         </div>
+        </section>
 
-        <h2 class="section-title" style="margin-top: 28px">사용자 목록</h2>
+        <section class="panel" id="panel-users" style="display: none">
         <div class="card">
           <form id="user-search-form" class="filter-bar">
             <label class="field" style="flex: 1; min-width: 200px">
@@ -133,7 +141,8 @@
             <button type="button" id="us-next" class="btn-ghost">다음</button>
           </div>
         </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <div id="user-modal" class="modal" style="display: none">
