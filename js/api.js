@@ -249,6 +249,58 @@ window.Api = (function () {
     );
   }
 
+  // 헥토 Anylink 원화 송금. POST /admin/remit
+  // request: { bankCd, custAcntNo, custAcntSumry, amt, pointHistoryUuid }
+  // 성공 시 { ok: true, data: RemitResult }, 실패 시 { ok: false, error: 메시지 } 반환.
+  async function remit(accessToken, request) {
+    var res;
+    try {
+      res = await fetch(CONFIG.API_BASE_URL + "/admin/remit", {
+        method: "POST",
+        headers: {
+          accessToken: accessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+    } catch (e) {
+      return { ok: false, error: "네트워크 오류가 발생했습니다." };
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body) {
+      return { ok: false, error: "응답을 해석할 수 없습니다." };
+    }
+    if (body.responseCode !== "OK") {
+      return { ok: false, error: body.errorMessage || "송금에 실패했습니다." };
+    }
+    return { ok: true, data: body.responseData };
+  }
+
+  // 헥토 지급대행 예치금 잔액 조회. GET /admin/remit/balance
+  // 성공 시 RemitBalanceResult 반환, 실패 시 null.
+  async function getRemitBalance(accessToken) {
+    var res;
+    try {
+      res = await fetch(CONFIG.API_BASE_URL + "/admin/remit/balance", {
+        method: "GET",
+        headers: { accessToken: accessToken },
+      });
+    } catch (e) {
+      return null; // 네트워크 오류
+    }
+
+    var body = await res.json().catch(function () {
+      return null;
+    });
+    if (!body || body.responseCode !== "OK") {
+      return null;
+    }
+    return body.responseData || null; // RemitBalanceResult
+  }
+
   return {
     fetchMe: fetchMe,
     isAdmin: isAdmin,
@@ -261,5 +313,7 @@ window.Api = (function () {
     fetchUser: fetchUser,
     fetchUserPayouts: fetchUserPayouts,
     giveBonus: giveBonus,
+    remit: remit,
+    getRemitBalance: getRemitBalance,
   };
 })();

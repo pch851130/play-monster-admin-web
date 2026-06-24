@@ -64,6 +64,7 @@
       "panel-points": initPointSum(),
       "panel-payouts": initPayouts(showDetail),
       "panel-users": initUsers(showDetail),
+      "panel-remit": initRemit(),
     };
     initMenu(loaders);
   }
@@ -398,6 +399,130 @@
     });
 
     return load; // 메뉴 진입 시 첫 페이지 조회
+  }
+
+  // 원화 송금 / 예치금 잔액 조회 패널
+  function initRemit() {
+    // RemitBalanceResult 필드 → 화면 라벨
+    var BALANCE_LABELS = {
+      success: "성공 여부",
+      mchtId: "가맹점 ID",
+      trdNo: "거래번호",
+      trdDt: "거래일자",
+      trdTm: "거래시각",
+      outStatCd: "출금 상태코드",
+      outRsltCd: "출금 결과코드",
+      outRsltMsg: "출금 결과메시지",
+      blcKrw: "원화 잔액(KRW)",
+      blcUsd: "달러 잔액(USD)",
+    };
+
+    var balanceBtn = document.getElementById("rm-balance-btn");
+    var balanceMessage = document.getElementById("rm-balance-message");
+    var balanceTable = document.getElementById("rm-balance-table");
+    var balanceBody = document.getElementById("rm-balance-body");
+
+    var form = document.getElementById("remit-form");
+    var message = document.getElementById("rm-message");
+    var resultTable = document.getElementById("rm-result-table");
+    var resultBody = document.getElementById("rm-result-body");
+
+    function num(v) {
+      return typeof v === "number" ? v.toLocaleString() : text(v);
+    }
+
+    function fmtVal(v) {
+      if (typeof v === "boolean") {
+        return v ? "예" : "아니오";
+      }
+      return num(v);
+    }
+
+    // 객체를 키-값 테이블로 렌더링. labels 가 있으면 키를 라벨로 치환.
+    function renderObject(targetBody, obj, labels) {
+      targetBody.innerHTML = Object.keys(obj)
+        .map(function (key) {
+          var label = (labels && labels[key]) || key;
+          return (
+            "<tr><th>" + esc(label) + "</th>" +
+            "<td>" + esc(fmtVal(obj[key])) + "</td></tr>"
+          );
+        })
+        .join("");
+    }
+
+    function showBalanceMessage(msg) {
+      balanceTable.style.display = "none";
+      balanceMessage.textContent = msg;
+      balanceMessage.style.display = "block";
+    }
+
+    async function loadBalance() {
+      balanceBtn.disabled = true;
+      showBalanceMessage("불러오는 중...");
+      var result = await Api.getRemitBalance(Auth.getToken());
+      balanceBtn.disabled = false;
+      if (!result) {
+        showBalanceMessage("잔액 조회에 실패했습니다.");
+        return;
+      }
+      renderObject(balanceBody, result, BALANCE_LABELS);
+      balanceMessage.style.display = "none";
+      balanceTable.style.display = "table";
+    }
+
+    function showMessage(msg) {
+      resultTable.style.display = "none";
+      message.textContent = msg;
+      message.style.display = "block";
+    }
+
+    async function submitRemit() {
+      var amt = parseInt(document.getElementById("rm-amt").value, 10);
+      var request = {
+        bankCd: document.getElementById("rm-bankCd").value.trim(),
+        custAcntNo: document.getElementById("rm-custAcntNo").value.trim(),
+        custAcntSumry: document.getElementById("rm-custAcntSumry").value.trim(),
+        amt: amt,
+        pointHistoryUuid: document.getElementById("rm-pointHistoryUuid").value.trim(),
+      };
+
+      if (!request.bankCd || !request.custAcntNo || !request.pointHistoryUuid) {
+        showMessage("은행코드, 고객 계좌번호, Point History UUID 는 필수입니다.");
+        return;
+      }
+      if (!amt || amt < 1) {
+        showMessage("금액은 1원 이상이어야 합니다.");
+        return;
+      }
+      if (!window.confirm(amt.toLocaleString() + "원을 송금할까요?")) {
+        return;
+      }
+
+      showMessage("송금 처리 중...");
+      var result = await Api.remit(Auth.getToken(), request);
+      if (!result.ok) {
+        showMessage("송금 실패: " + result.error);
+        return;
+      }
+      window.alert("송금 요청을 완료했습니다.");
+      // RemitResult 응답이 객체면 키-값으로 표시, 아니면 안내 문구만.
+      if (result.data && typeof result.data === "object") {
+        renderObject(resultBody, result.data, null);
+        message.style.display = "none";
+        resultTable.style.display = "table";
+      } else {
+        showMessage("송금 요청을 완료했습니다.");
+      }
+    }
+
+    balanceBtn.addEventListener("click", loadBalance);
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      submitRemit();
+    });
+
+    return loadBalance; // 패널 진입 시 잔액 자동 조회
   }
 
   // 공용 사용자 상세 모달. show(uuid, onChange) 로 열기.
