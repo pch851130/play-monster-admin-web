@@ -175,7 +175,7 @@
       }
       var uuid = esc(item.uuid);
       return (
-        '<button type="button" class="btn-mini btn-ok" data-action="remit" data-uuid="' +
+        '<button type="button" class="btn-mini btn-remit" data-action="remit" data-uuid="' +
         uuid +
         '">송금</button> ' +
         '<button type="button" class="btn-mini btn-ok" data-action="complete" data-uuid="' +

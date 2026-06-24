@@ -308,6 +308,11 @@ body {
   filter: brightness(0.9);
 }
 
+.btn-remit {
+  border-color: #2f9e44;
+  color: #2f9e44;
+}
+
 .btn-ok {
   border-color: var(--primary);
   color: var(--primary);
