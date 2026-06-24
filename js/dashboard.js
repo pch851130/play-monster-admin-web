@@ -178,9 +178,6 @@
         '<button type="button" class="btn-mini btn-remit" data-action="remit" data-uuid="' +
         uuid +
         '">송금</button> ' +
-        '<button type="button" class="btn-mini btn-ok" data-action="complete" data-uuid="' +
-        uuid +
-        '">성공</button> ' +
         '<button type="button" class="btn-mini btn-no" data-action="fail" data-uuid="' +
         uuid +
         '">실패</button>'
@@ -232,11 +229,6 @@
           return;
         }
         result = await Api.remitPayout(Auth.getToken(), uuid);
-      } else if (action === "complete") {
-        if (!window.confirm("이 출금을 성공(완료) 처리할까요?")) {
-          return;
-        }
-        result = await Api.completePayout(Auth.getToken(), uuid);
       } else {
         var reason = window.prompt("실패 사유를 입력하세요.");
         if (reason === null || reason.trim() === "") {

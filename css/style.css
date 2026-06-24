@@ -313,11 +313,6 @@ body {
   color: #2f9e44;
 }
 
-.btn-ok {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
 .btn-no {
   border-color: var(--danger);
   color: var(--danger);
