@@ -520,6 +520,9 @@
   // onChange: 보너스 지급 후 호출할 콜백(목록 갱신 등)
   function initUserDetail() {
     var modal = document.getElementById("user-modal");
+    if (!modal) {
+      return function () {}; // 모달 마크업이 없는 페이지에서는 동작하지 않는 no-op
+    }
     var modalBody = document.getElementById("user-detail-body");
     var modalClose = document.getElementById("user-modal-close");
     var bonusBtn = document.getElementById("user-bonus-btn");
