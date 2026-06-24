@@ -10,17 +10,17 @@ window.Auth = (function () {
     localStorage.removeItem(CONFIG.TOKEN_KEY);
   }
 
-  // 보호된 페이지용: 토큰이 있고 admin 이면 user 반환, 아니면 login.html 로 이동
+  // 보호된 페이지용: 토큰이 있고 admin 이면 user 반환, 아니면 로그인 페이지(index.html)로 이동
   async function requireAdmin() {
     var token = getToken();
     if (!token) {
-      location.replace("login.html");
+      location.replace("index.html");
       return null;
     }
     var user = await Api.fetchMe(token);
     if (!Api.isAdmin(user)) {
       clearToken();
-      location.replace("login.html?error=not_admin");
+      location.replace("index.html?error=not_admin");
       return null;
     }
     return user;
@@ -32,7 +32,7 @@ window.Auth = (function () {
       await Kakao.logout(token);
     }
     clearToken();
-    location.replace("login.html");
+    location.replace("index.html");
   }
 
   return {

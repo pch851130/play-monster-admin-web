@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Play Monster 어드민 - 일자별 포인트/사용자</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="brand">Play Monster 어드민</span>
+      <div class="topbar-right">
+        <span id="admin-name" class="admin-name"></span>
+        <button id="logout" class="btn-ghost" type="button">로그아웃</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>불러오는 중...</p>
+      </div>
+
+      <div id="content" class="content" style="display: none">
+        <nav class="menu">
+          <a class="menu-item active" href="points.html">일자별 포인트/사용자</a>
+          <a class="menu-item" href="payouts.html">출금(PAYOUT) 목록</a>
+          <a class="menu-item" href="users.html">사용자 목록</a>
+          <a class="menu-item" href="remit.html">원화 송금/잔액</a>
+        </nav>
+
+        <section class="panel" id="panel-points">
+        <div class="card">
+          <form id="point-sum-form" class="filter-bar">
+            <label class="field">
+              <span>기간(일)</span>
+              <select id="ps-day">
+                <option value="7">7일</option>
+                <option value="15">15일</option>
+                <option value="30">30일</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>타입</span>
+              <select id="ps-type">
+                <option value="OFFERWALL">OFFERWALL</option>
+                <option value="WELCOME">WELCOME</option>
+                <option value="REFERRAL">REFERRAL</option>
+                <option value="PAYOUT">PAYOUT</option>
+                <option value="DAILY_CHECK">DAILY_CHECK</option>
+                <option value="BONUS">BONUS</option>
+                <option value="WITHDRAW">WITHDRAW</option>
+              </select>
+            </label>
+            <button type="submit" class="btn-primary">조회</button>
+          </form>
+
+          <p id="ps-message" class="hint" style="display: none"></p>
+
+          <table class="info-table" id="ps-table" style="display: none">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <td>포인트 합계</td>
+                <td>사용자수</td>
+              </tr>
+            </thead>
+            <tbody id="ps-body"></tbody>
+          </table>
+        </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/kakao.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

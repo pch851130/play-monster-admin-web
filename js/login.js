@@ -2,7 +2,7 @@
 (function () {
   // 이미 로그인되어 있으면 대시보드로
   if (Auth.getToken()) {
-    location.replace("index.html");
+    location.replace("points.html");
     return;
   }
 

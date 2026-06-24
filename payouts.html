@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Play Monster 어드민 - 출금(PAYOUT) 목록</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="brand">Play Monster 어드민</span>
+      <div class="topbar-right">
+        <span id="admin-name" class="admin-name"></span>
+        <button id="logout" class="btn-ghost" type="button">로그아웃</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>불러오는 중...</p>
+      </div>
+
+      <div id="content" class="content" style="display: none">
+        <nav class="menu">
+          <a class="menu-item" href="points.html">일자별 포인트/사용자</a>
+          <a class="menu-item active" href="payouts.html">출금(PAYOUT) 목록</a>
+          <a class="menu-item" href="users.html">사용자 목록</a>
+          <a class="menu-item" href="remit.html">원화 송금/잔액</a>
+        </nav>
+
+        <section class="panel" id="panel-payouts">
+        <div class="card">
+          <form id="payout-form" class="filter-bar">
+            <label class="field">
+              <span>상태</span>
+              <select id="po-status">
+                <option value="PENDING">PENDING</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+            </label>
+            <button type="submit" class="btn-primary">조회</button>
+          </form>
+
+          <p id="po-message" class="hint" style="display: none"></p>
+
+          <div class="table-scroll">
+            <table class="list-table" id="po-table" style="display: none">
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>포인트</th>
+                  <th>상태</th>
+                  <th>이름</th>
+                  <th>은행</th>
+                  <th>계좌번호</th>
+                  <th>생년월일</th>
+                  <th>실패사유</th>
+                  <th>처리</th>
+                </tr>
+              </thead>
+              <tbody id="po-body"></tbody>
+            </table>
+          </div>
+        </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="user-modal" class="modal" style="display: none">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3 class="section-title" style="margin: 0">사용자 상세</h3>
+          <button type="button" id="user-modal-close" class="btn-ghost">닫기</button>
+        </div>
+        <table class="info-table">
+          <tbody id="user-detail-body"></tbody>
+        </table>
+
+        <h4 class="section-title" style="margin: 20px 0 10px">출금 내역</h4>
+        <p id="user-payout-message" class="hint" style="display: none"></p>
+        <div class="table-scroll">
+          <table class="list-table" id="user-payout-table" style="display: none">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>포인트</th>
+                <th>상태</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>실패사유</th>
+              </tr>
+            </thead>
+            <tbody id="user-payout-body"></tbody>
+          </table>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" id="user-bonus-btn" class="btn-primary">보너스 지급</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/kakao.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

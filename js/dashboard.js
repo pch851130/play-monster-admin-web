@@ -56,50 +56,22 @@
 
     document.getElementById("admin-name").textContent = user.name || user.referralCode || "관리자";
 
-    // 공용 사용자 상세 모달(출금/사용자 목록에서 공유)
-    var showDetail = initUserDetail();
+    // 페이지가 분리되어 있으므로, 현재 페이지에 존재하는 패널만 초기화하고 즉시 조회한다.
+    // 출금/사용자 페이지에만 있는 공용 상세 모달은 있을 때만 초기화.
+    var showDetail = document.getElementById("user-modal") ? initUserDetail() : null;
 
-    // 각 패널의 로더를 등록(아직 조회하지 않음)
-    var loaders = {
-      "panel-points": initPointSum(),
-      "panel-payouts": initPayouts(showDetail),
-      "panel-users": initUsers(showDetail),
-      "panel-remit": initRemit(),
-    };
-    initMenu(loaders);
-  }
-
-  // 상단 메뉴(탭): 클릭한 메뉴의 패널만 표시 + 최초 진입 시에만 조회(지연 로딩)
-  function initMenu(loaders) {
-    var menu = document.getElementById("menu");
-    var items = menu.querySelectorAll(".menu-item");
-    var loaded = {}; // 이미 조회한 패널 기록
-
-    function activate(target) {
-      items.forEach(function (item) {
-        var on = item.getAttribute("data-target") === target;
-        item.classList.toggle("active", on);
-        document.getElementById(item.getAttribute("data-target")).style.display = on ? "block" : "none";
-      });
-
-      // 해당 패널을 처음 여는 경우에만 데이터 조회
-      if (!loaded[target] && loaders[target]) {
-        loaded[target] = true;
-        loaders[target]();
-      }
+    if (document.getElementById("panel-points")) {
+      initPointSum()();
     }
-
-    menu.addEventListener("click", function (e) {
-      var btn = e.target.closest(".menu-item");
-      if (!btn) {
-        return;
-      }
-      activate(btn.getAttribute("data-target"));
-    });
-
-    // 기본 활성 메뉴 조회
-    var initial = menu.querySelector(".menu-item.active") || items[0];
-    activate(initial.getAttribute("data-target"));
+    if (document.getElementById("panel-payouts")) {
+      initPayouts(showDetail)();
+    }
+    if (document.getElementById("panel-users")) {
+      initUsers(showDetail)();
+    }
+    if (document.getElementById("panel-remit")) {
+      initRemit()();
+    }
   }
 
   // 일자별 포인트 합계 조회 폼 동작

@@ -6,7 +6,7 @@
     if (token) {
       Kakao.logout(token);
     }
-    location.replace("login.html?error=" + error);
+    location.replace("index.html?error=" + error);
   }
 
   async function run() {
@@ -36,7 +36,7 @@
       }
 
       Auth.setToken(token);
-      location.replace("index.html");
+      location.replace("points.html");
     } catch (e) {
       console.error(e);
       fail("server", token);
