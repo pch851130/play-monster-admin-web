@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Play Monster 어드민 - 원화 송금/잔액</title>
+    <title>Play Monster 어드민 - 예치금 잔액</title>
     <link rel="stylesheet" href="css/style.css?v=20260624" />
   </head>
   <body>
@@ -26,7 +26,7 @@
           <a class="menu-item" href="points.html">일자별 포인트/사용자</a>
           <a class="menu-item" href="payouts.html">출금(PAYOUT) 목록</a>
           <a class="menu-item" href="users.html">사용자 목록</a>
-          <a class="menu-item active" href="remit.html">원화 송금/잔액</a>
+          <a class="menu-item active" href="remit.html">예치금 잔액</a>
         </nav>
 
         <section class="panel" id="panel-remit">
@@ -38,38 +38,6 @@
           <p id="rm-balance-message" class="hint" style="display: none"></p>
           <table class="info-table" id="rm-balance-table" style="display: none">
             <tbody id="rm-balance-body"></tbody>
-          </table>
-        </div>
-
-        <div class="card">
-          <h4 class="section-title" style="margin: 0 0 12px">원화 송금</h4>
-          <form id="remit-form" class="filter-bar">
-            <label class="field">
-              <span>은행코드</span>
-              <input id="rm-bankCd" type="text" placeholder="예: 004" />
-            </label>
-            <label class="field">
-              <span>고객 계좌번호</span>
-              <input id="rm-custAcntNo" type="text" />
-            </label>
-            <label class="field">
-              <span>적요(통장표시)</span>
-              <input id="rm-custAcntSumry" type="text" />
-            </label>
-            <label class="field">
-              <span>금액(원)</span>
-              <input id="rm-amt" type="number" min="1" />
-            </label>
-            <label class="field" style="flex: 1; min-width: 220px">
-              <span>Point History UUID (멱등키)</span>
-              <input id="rm-pointHistoryUuid" type="text" style="width: 100%" />
-            </label>
-            <button type="submit" class="btn-primary">송금</button>
-          </form>
-
-          <p id="rm-message" class="hint" style="display: none"></p>
-          <table class="info-table" id="rm-result-table" style="display: none">
-            <tbody id="rm-result-body"></tbody>
           </table>
         </div>
         </section>

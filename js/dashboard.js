@@ -389,34 +389,10 @@
       blcUsd: "달러 잔액(USD)",
     };
 
-    // RemitResult 필드 → 화면 라벨
-    var RESULT_LABELS = {
-      success: "성공 여부",
-      mchtId: "가맹점 ID",
-      mchtTrdNo: "가맹점 거래번호",
-      encCd: "구분코드(encCd)",
-      trdNo: "거래번호",
-      trdDt: "거래일자",
-      trdTm: "거래시각",
-      outStatCd: "출금 상태코드",
-      outRsltCd: "출금 결과코드",
-      outRsltMsg: "출금 결과메시지",
-      bankCd: "은행코드",
-      custAcntNo: "고객 계좌번호",
-      custAcntSumry: "적요(통장표시)",
-      amt: "송금 금액",
-      balance: "잔액",
-    };
-
     var balanceBtn = document.getElementById("rm-balance-btn");
     var balanceMessage = document.getElementById("rm-balance-message");
     var balanceTable = document.getElementById("rm-balance-table");
     var balanceBody = document.getElementById("rm-balance-body");
-
-    var form = document.getElementById("remit-form");
-    var message = document.getElementById("rm-message");
-    var resultTable = document.getElementById("rm-result-table");
-    var resultBody = document.getElementById("rm-result-body");
 
     function num(v) {
       return typeof v === "number" ? v.toLocaleString() : text(v);
@@ -462,56 +438,7 @@
       balanceTable.style.display = "table";
     }
 
-    function showMessage(msg) {
-      resultTable.style.display = "none";
-      message.textContent = msg;
-      message.style.display = "block";
-    }
-
-    async function submitRemit() {
-      var amt = parseInt(document.getElementById("rm-amt").value, 10);
-      var request = {
-        bankCd: document.getElementById("rm-bankCd").value.trim(),
-        custAcntNo: document.getElementById("rm-custAcntNo").value.trim(),
-        custAcntSumry: document.getElementById("rm-custAcntSumry").value.trim(),
-        amt: amt,
-        pointHistoryUuid: document.getElementById("rm-pointHistoryUuid").value.trim(),
-      };
-
-      if (!request.bankCd || !request.custAcntNo || !request.pointHistoryUuid) {
-        showMessage("은행코드, 고객 계좌번호, Point History UUID 는 필수입니다.");
-        return;
-      }
-      if (!amt || amt < 1) {
-        showMessage("금액은 1원 이상이어야 합니다.");
-        return;
-      }
-      if (!window.confirm(amt.toLocaleString() + "원을 송금할까요?")) {
-        return;
-      }
-
-      showMessage("송금 처리 중...");
-      var result = await Api.remit(Auth.getToken(), request);
-      if (!result.ok) {
-        showMessage("송금 실패: " + result.error);
-        return;
-      }
-      window.alert("송금 요청을 완료했습니다.");
-      // RemitResult 응답이 객체면 키-값으로 표시, 아니면 안내 문구만.
-      if (result.data && typeof result.data === "object") {
-        renderObject(resultBody, result.data, RESULT_LABELS);
-        message.style.display = "none";
-        resultTable.style.display = "table";
-      } else {
-        showMessage("송금 요청을 완료했습니다.");
-      }
-    }
-
     balanceBtn.addEventListener("click", loadBalance);
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      submitRemit();
-    });
 
     return loadBalance; // 패널 진입 시 잔액 자동 조회
   }
