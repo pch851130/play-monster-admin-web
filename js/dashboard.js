@@ -175,6 +175,9 @@
       }
       var uuid = esc(item.uuid);
       return (
+        '<button type="button" class="btn-mini btn-ok" data-action="remit" data-uuid="' +
+        uuid +
+        '">송금</button> ' +
         '<button type="button" class="btn-mini btn-ok" data-action="complete" data-uuid="' +
         uuid +
         '">성공</button> ' +
@@ -224,7 +227,12 @@
 
     async function handleAction(action, uuid) {
       var result;
-      if (action === "complete") {
+      if (action === "remit") {
+        if (!window.confirm("이 출금을 송금 처리할까요?")) {
+          return;
+        }
+        result = await Api.remitPayout(Auth.getToken(), uuid);
+      } else if (action === "complete") {
         if (!window.confirm("이 출금을 성공(완료) 처리할까요?")) {
           return;
         }

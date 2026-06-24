@@ -137,6 +137,14 @@ window.Api = (function () {
     return true;
   }
 
+  // PENDING 출금을 송금 처리. PUT /admin/payouts/{uuid}/remit
+  async function remitPayout(accessToken, uuid) {
+    return putPayout(
+      CONFIG.API_BASE_URL + "/admin/payouts/" + encodeURIComponent(uuid) + "/remit",
+      accessToken
+    );
+  }
+
   // PENDING 출금을 완료(COMPLETED) 처리. PUT /admin/payouts/{uuid}/complete
   async function completePayout(accessToken, uuid) {
     return putPayout(
@@ -307,6 +315,7 @@ window.Api = (function () {
     fetchDailyPointSum: fetchDailyPointSum,
     fetchDailyUserCount: fetchDailyUserCount,
     fetchPayouts: fetchPayouts,
+    remitPayout: remitPayout,
     completePayout: completePayout,
     failPayout: failPayout,
     fetchUsers: fetchUsers,
