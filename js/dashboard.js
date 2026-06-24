@@ -417,6 +417,25 @@
       blcUsd: "달러 잔액(USD)",
     };
 
+    // RemitResult 필드 → 화면 라벨
+    var RESULT_LABELS = {
+      success: "성공 여부",
+      mchtId: "가맹점 ID",
+      mchtTrdNo: "가맹점 거래번호",
+      encCd: "구분코드(encCd)",
+      trdNo: "거래번호",
+      trdDt: "거래일자",
+      trdTm: "거래시각",
+      outStatCd: "출금 상태코드",
+      outRsltCd: "출금 결과코드",
+      outRsltMsg: "출금 결과메시지",
+      bankCd: "은행코드",
+      custAcntNo: "고객 계좌번호",
+      custAcntSumry: "적요(통장표시)",
+      amt: "송금 금액",
+      balance: "잔액",
+    };
+
     var balanceBtn = document.getElementById("rm-balance-btn");
     var balanceMessage = document.getElementById("rm-balance-message");
     var balanceTable = document.getElementById("rm-balance-table");
@@ -508,7 +527,7 @@
       window.alert("송금 요청을 완료했습니다.");
       // RemitResult 응답이 객체면 키-값으로 표시, 아니면 안내 문구만.
       if (result.data && typeof result.data === "object") {
-        renderObject(resultBody, result.data, null);
+        renderObject(resultBody, result.data, RESULT_LABELS);
         message.style.display = "none";
         resultTable.style.display = "table";
       } else {
